@@ -1,0 +1,138 @@
+<html>
+    <head>
+            <link rel="stylesheet" type="text/css" href="styles.css">
+    </head>
+    <body>
+        <div class="page">
+            <div id="list-page">
+                <div class="app-header">
+                    <h1>Task List</h1>
+                    <div>
+                        <input type="checkbox" id="show-expired" onchange="toggleExpiredTasks()"></input>
+                        <span>Show Expirated Tasks</span>
+                    </div>
+                    <button class="remove-button" onclick="removeExpiredTasks()">Remove Expirated Tasks</button>
+                </div>
+                <div class="list-container">
+                    <div class="list-header">
+                        <span class="row-checkbox">Is Expired</span>
+                        <span class="row-task">Task</span>
+                        <span class="row-expiry-date">Expiry in</span>
+                    </div>
+                    <div class="list-body" id="body">
+                    </div>
+                </div>
+                <button class="new-task-button" onclick="toggleForm()">New Task</button>
+            </div>
+            <div id="form-page">
+                <div class="form-page">
+                    <h1>New Task</h1>
+                    <div class="form-container">
+                        <input id="task-name"></input>
+                        <input type="date" id="expiry-in"></input>
+                    </div>
+                    <button class="new-task-button" onclick="addTask()">Add</button>
+                    <button class="remove-button" onclick="toggleForm()">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        document.getElementById("show-expired").checked = true;
+        function addTask() {
+            const expiryForm = document.getElementById("expiry-in");
+            const isExpired = new Date(expiryForm.value).getTime() < new Date().getTime();
+            const listRow = document.getElementById("body");
+            const taskInput = document.getElementById("task-name");
+            const newRow = createRow(isExpired);
+            const checkbox = createCheckbox(isExpired);
+            const taskName = createTaskName(taskInput.value, isExpired);
+            const expiryIn = createExpiryIn(formatDate(expiryForm.value));
+            newRow.appendChild(checkbox);
+            newRow.appendChild(taskName);
+            newRow.appendChild(expiryIn);
+            listRow.appendChild(newRow);
+            const isShowingExpiredTasks = document.getElementById("show-expired").checked;
+            console.log(isShowingExpiredTasks)
+            if (isExpired === true && isShowingExpiredTasks === false) {
+                newRow.style.display = "none";
+            }
+            toggleForm();
+        }
+
+        function removeInputsValues() {
+            const inputs = document.getElementsByTagName("input");
+            for (var i = 0; i < inputs.length; i += 1) {
+                inputs[i].value = null;
+            }            
+        }
+
+        function formatDate(date) {
+            const dateArray = date.split('-');
+            return `${dateArray[2]}-${dateArray[1]}-${dateArray[0]}`;
+        }
+
+        function createExpiryIn(date) {
+            const span = document.createElement("span");
+            span.setAttribute("class", "row-expiry-date");
+            span.innerHTML = date;
+            return span;
+        }
+
+        function createTaskName(taskName, isExpired) {
+            const span = document.createElement("span");
+            span.setAttribute("class", "row-task");
+            if (isExpired) span.style.textDecoration = "line-through";
+            span.innerHTML = taskName;
+            return span;
+        }
+
+        function createRow(isExpired) {
+            const newRow = document.createElement("div");
+            newRow.setAttribute("class", "list-row");
+            if (isExpired) newRow.setAttribute("class", "list-row expired");
+            return newRow;
+        }
+
+        function createCheckbox(isDone) {
+            const span = document.createElement("span");
+            span.setAttribute("class", "row-checkbox");
+            const checkbox = document.createElement("input");
+            checkbox.setAttribute("type", "checkbox");
+            checkbox.checked = isDone;
+            span.appendChild(checkbox);
+            return span; 
+        }
+
+        function toggleForm() {
+            const formPage = document.getElementById("form-page");
+            const listPage = document.getElementById("list-page");
+            if (formPage.style.display === "flex") {
+                formPage.style.display = "none";
+                listPage.style.display = "block";
+            } else {
+                formPage.style.display = "flex";
+                listPage.style.display = "none";
+            }
+            removeInputsValues();
+        }
+
+        function removeExpiredTasks() {
+            const elements = document.getElementsByClassName("expired");
+            const listRow = document.getElementById("body");
+            for(var i = 0; i < elements.length; i += 1) {
+                listRow.removeChild(elements[i])
+            }
+        }
+
+        function toggleExpiredTasks() {
+            const elements = document.getElementsByClassName("expired");
+            const listRow = document.getElementById("body");
+            for(var i = 0; i < elements.length; i += 1) {
+                const isShowing = elements[i].style.display !== "none";
+                elements[i].style.display = isShowing ? "none" : "flex";
+            }
+        }
+
+    </script>
+</html>
